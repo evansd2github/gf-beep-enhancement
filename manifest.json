@@ -1,18 +1,33 @@
 {
-  "manifest_version": 3,
-  "name": "GF Beep",
+  "name": "GF Beep Enhancement",
   "version": "2.0",
-  "description": "Plays a sound when Glowforge is ready",
-  "permissions": ["scripting"],
-  "host_permissions": ["*://*.glowforge.com/*"],
+  "description": "Make a noise when Glowforge is ready.",
+  "icons": {
+    "16": "gf_beep16.png",
+    "48": "gf_beep48.png",
+    "128": "gf_beep128.png"
+  },
   "content_scripts": [
     {
-      "matches": ["*://*.glowforge.com/*"],
-      "js": ["content.js"]
+      "matches": [
+        "https://app.glowforge.com/*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "content.js"
+      ]
     }
   ],
-  "web_accessible_resources": [{
-    "resources": ["sounds/ready.mp3"],
-    "matches": ["*://*.glowforge.com/*"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sounds/ready.mp3"
+      ],
+      "matches": [
+        "https://app.glowforge.com/*"
+      ]
+    }
+  ],
+  "manifest_version": 3,
+  "content_security_policy": {}
 }
