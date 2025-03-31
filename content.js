@@ -38,16 +38,12 @@ window.addEventListener('load', function() {
   initAudio();
 });
 
-// We use the scanninging attribute to decide when to beep
+// We use the scanning attribute to decide when to beep
 var isScanning = false;
 var checkAndBeep = function () {
-  //console.log("Checking for scanning status...");
-  var scanningElement = document.querySelector('div.MachineStatusIcon.scanning');
-  //console.log("Scanning element found:", !!scanningElement);
-  //console.log("Current isScanning state:", isScanning);
   
-  if (scanningElement) {
-      //console.log("Scanning state changed to true, waiting to play sound");
+  //determine if we're in a scanning state.
+  if (document.querySelector('div.MachineStatusIcon.scanning')) {
       isScanning = true;
   }
   else {
@@ -55,7 +51,6 @@ var checkAndBeep = function () {
       // It was just scanning, but now the scanner is missing, so it means we're ready.
       // Make sure audio is initialized
       if (!readyAudio) {
-        //console.log("Audio not initialized yet");
         initAudio();
         }
       
@@ -63,9 +58,7 @@ var checkAndBeep = function () {
       var promise = readyAudio.play();
       if (promise !== undefined) {
         promise.then(_ => {
-          //console.log("Successfully played print ready sound");
         }).catch(error => {
-          //console.log("Failed to play sound:", error);
           // If playback fails, re-initialize audio for next attempt
           readyAudio = null;
           initAudio();
@@ -84,25 +77,19 @@ var beepObserver = new MutationObserver(mutations => {
 });
 
 var attachBeepObserver = function () {
-  //console.log("Trying to find my print button...");
   var el = document.querySelector('div.print-button');
   if (el) {
-    //console.log("Found print button:", el);
     beepObserver.observe(el, {
       attributes: true,
       childList: true,
       subtree: true,
     });
-    //console.log("GF beep extension attached print button observer");
     
     // Do an initial check
     checkAndBeep();
   }
   else {
-    console.log("ERROR: Didn't find print button, DOM structure may have changed");
-    // Log the current DOM structure to help identify new selectors
-    console.log("Current relevant DOM:", document.querySelector('div.TopNav'));
-    
+    // didn't find a print button, this is a problem.
     // Try again in a few seconds in case the UI is still loading
     setTimeout(attachBeepObserver, 3000);
   }
@@ -114,14 +101,14 @@ new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     if (mutation.type == 'childList') {
       mutation.addedNodes.forEach(node => {
-        if (node.nodeType === 1 && node.matches && node.matches('.NavbarDesignNameEditor')) {
+        if (node.nodeType === Node.ELEMENT_NODE && node.matches('.NavbarDesignNameEditor')) {
           //console.log("Detected navigation to design editor");
           attachBeepObserver();
         }
       });
     }
   });
-}).observe(document.querySelector('div.TopNav') || document.body, {
+}).observe(document.querySelector('div.TopNavV2') || document.body, {
   childList: true,
   subtree: true
 });
